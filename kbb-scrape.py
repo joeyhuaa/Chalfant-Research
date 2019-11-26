@@ -6,15 +6,13 @@ with open('kbb-output.csv', 'w') as f:
   writer = csv.writer(f)
 
   headers = ['mileage', 'body', 'extcol', 'intcol', 'fuecon',
-             'engine', 'fuetype', 'trans', 'drivetype', 'doors',
+             'engine', 'ftype', 'trans', 'dtype', 'doors',
              'make_model']
 
   writer.writerow(headers)
 
-  # price
-  # model and make
-
-  for pg in range(1,41):
+  # loop through each page
+  for pg in range(1, 41):
     url = 'https://www.kbb.com/cars-for-sale/cars/?p=' + str(pg) + '&distance=75&searchtype=used&atcmodelcode=all&nr=25&atcmakecode=honda&atctrim=all'
     sauce = urllib.request.urlopen(url).read()
     soup = bs(sauce, 'html.parser')
@@ -33,15 +31,31 @@ with open('kbb-output.csv', 'w') as f:
       sauce_2 = urllib.request.urlopen(url_2).read()
       soup_2 = bs(sauce_2, 'html.parser')
 
-      # get car details
-      # fuck yeah!! list comprehension!!
-      car_details = soup_2.find('div', class_='details-list').find_all('li')
-      car_details_list = [detail.text.split(': ')[1].strip() for detail in car_details if detail.text.split(': ')[1].strip() != '']
+      # get car details from KBB
+      car_details_list_scraped = [detail.text.strip() for detail in soup_2.find('div', class_='details-list').find_all('li')]
 
-      # get make and model
-      car_details_list.append(make_model)
+      # allocate everything to a dict, while accounting for missing details
+      # headers_complete contain headers that are the same as those on KBB, letter for letter
+      # this is for matching purposes in the for loop down below
+      headers_complete = ['Mileage', 'Body Style', 'Exterior Color', 'Interior Color', 'Fuel Economy',
+                          'Engine', 'Fuel Type', 'Transmission', 'Drive Type', 'Doors']
 
-      # write everything to csv
-      writer.writerow(car_details_list)
+      car_details_list_organized = dict.fromkeys(headers_complete, '')
+
+      # loop thru all the keys in headers_complete
+      for index in range(len(headers_complete)):
+        for detail in car_details_list_scraped:
+          key = headers_complete[index]
+
+          # go thru and check if the header exists on the site,
+          # if it's there, add it to the dict
+          if detail.split(': ')[0] == key:
+            car_details_list_organized[key] = detail.split(': ')[1]
+
+      # finally, insert make_model to car_details_list_organized
+      car_details_list_organized['Make_Model'] = make_model
+
+      # write it out to csv file
+      writer.writerow(car_details_list_organized.values())
 
     print('done with page', pg)
