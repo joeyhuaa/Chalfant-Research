@@ -29,19 +29,23 @@ def parse(url):
       if detail.split(': ')[0] == key:
         car_details_dict_organized[key] = detail.split(': ')[1]
 
-  # finally, insert car_title to car_details_list_organized
+  # finally, insert car_title and price to car_details_list_organized
   car_title = soup_2.find('h1', class_='primary-vehicle-title').text.strip()
-  car_details_list_organized = list(car_details_dict_organized.values())
-  car_details_list_organized.insert(0, car_title)
+  price = soup_2.find('span', class_='js-price').text.strip().replace('$', '').replace(',', '')
 
-  # append is too slow!
+  car_details_list_organized = list(car_details_dict_organized.values())
+
+  car_details_list_organized.insert(0, car_title)
+  car_details_list_organized.insert(1, price)
+
+  # append is too slow! return instead
   return car_details_list_organized
 
 # write to csv
 with open('kbb-output.csv', 'w') as f:
   writer = csv.writer(f)
 
-  headers = ['car_title', 'mileage', 'body', 'extcol', 'intcol',
+  headers = ['car_title', 'price', 'mileage', 'body', 'extcol', 'intcol',
              'fuecon', 'engine', 'ftype', 'trans', 'dtype',
              'doors']
 
@@ -74,6 +78,7 @@ with open('kbb-output.csv', 'w') as f:
     for record in records:
       for rec in record:
         writer.writerow(rec)
+        print(rec)
 
     print('done with page', pg)
 
