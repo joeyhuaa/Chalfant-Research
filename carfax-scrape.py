@@ -4,7 +4,7 @@ import requests
 
 with open('carfax-output.csv', 'w') as f:
   writer = csv.writer(f)
-  headings = ['make', 'model', 'vin', 'price', 'year',
+  headings = ['make', 'model', 'price', 'year',
               'mileage', 'engine', 'extCol', 'intCol', 'trans',
               'dtype', 'mpgCity', 'mpgHw', 'condition']
   writer.writerow(headings)
@@ -21,7 +21,6 @@ with open('carfax-output.csv', 'w') as f:
       car_info = []
       car_info.append(listing['make'])
       car_info.append(listing['model'])
-      car_info.append(listing['vin'])
       car_info.append(listing['listPrice'])
       car_info.append(listing['year'])
       car_info.append(listing['mileage'])
