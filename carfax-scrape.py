@@ -15,9 +15,9 @@ with open('carfax-output.csv', 'w') as f:
     headers = {'User-Agent': user_agent}
 
     sauce = requests.get(url, headers=headers)
-    data = json.loads(sauce.text)
+    json = json.loads(sauce.text)
 
-    for listing in data['listings']:
+    for listing in json['listings']:
       car_info = []
       car_info.append(listing['make'])
       car_info.append(listing['model'])
